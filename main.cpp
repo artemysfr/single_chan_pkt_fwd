@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <sys/time.h>
 #include <cstring>
+#include <unistd.h>	/* getopt */
 
 #include <sys/ioctl.h>
 #include <net/if.h>
@@ -85,9 +86,10 @@ static char description[64] = "";                        /* used for free form d
 
 // define servers
 // TODO: use host names and dns
-#define SERVER1 "54.72.145.119"    // The Things Network: croft.thethings.girovito.nl
 //#define SERVER2 "192.168.1.10"      // local
 #define PORT 1700                   // The port on which to send data
+static char *server_ip = (char*) "54.72.145.119"; /* The Things Network: croft.thethings.girovito.nl */
+static int server_port = PORT;
 
 // #############################################
 // #############################################
@@ -317,7 +319,7 @@ void sendudp(char *msg, int length) {
 
 //send the update
 #ifdef SERVER1
-    inet_aton(SERVER1 , &si_other.sin_addr);
+    inet_aton(server_ip, &si_other.sin_addr);
     if (sendto(s, (char *)msg, length, 0 , (struct sockaddr *) &si_other, slen)==-1)
     {
         die("sendto()");
@@ -325,7 +327,7 @@ void sendudp(char *msg, int length) {
 #endif
 
 #ifdef SERVER2
-    inet_aton(SERVER2 , &si_other.sin_addr);
+    inet_aton(server_ip, &si_other.sin_addr);
     if (sendto(s, (char *)msg, length , 0 , (struct sockaddr *) &si_other, slen)==-1)
     {
         die("sendto()");
@@ -531,10 +533,29 @@ void receivepacket() {
     } // dio0=1
 }
 
-int main () {
-
+int main (int argc, char *argv[])
+{
     struct timeval nowtime;
     uint32_t lasttime;
+    int option = -1;
+
+    while ((option = getopt (argc, argv, "i:p:")) != -1)
+    {
+         switch (option)
+         {
+         case 'i':
+             server_ip = strdup(optarg);
+             break;
+         case 'p':
+             server_port = atoi(strdup(optarg));
+             break;
+         default:
+             fprintf(stderr, "Usage: %s [-i ip] [-p port]\n",
+                       argv[0]);
+             exit(EXIT_FAILURE);
+             break;
+         }
+    }
 
     wiringPiSetup () ;
     pinMode(ssPin, OUTPUT);
@@ -553,7 +574,7 @@ int main () {
     }
     memset((char *) &si_other, 0, sizeof(si_other));
     si_other.sin_family = AF_INET;
-    si_other.sin_port = htons(PORT);
+    si_other.sin_port = htons(server_port);
 
     ifr.ifr_addr.sa_family = AF_INET;
     strncpy(ifr.ifr_name, "eth0", IFNAMSIZ-1);  // can we rely on eth0?
@@ -570,6 +591,8 @@ int main () {
 
     printf("Listening at SF%i on %.6lf Mhz.\n", sf,(double)freq/1000000);
     printf("------------------\n");
+
+    printf("Forwarding packets to server %s on port %d\n", server_ip, server_port);
 
     while(1) {
 
