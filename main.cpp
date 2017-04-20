@@ -33,7 +33,7 @@ using namespace std;
 typedef bool boolean;
 typedef unsigned char byte;
 
-static const int CHANNEL = 0;
+static const int SPI_CHANNEL = 0;
 
 byte currentMode = 0x81;
 
@@ -185,7 +185,7 @@ byte readRegister(byte addr)
     selectreceiver();
     spibuf[0] = addr & 0x7F;
     spibuf[1] = 0x00;
-    wiringPiSPIDataRW(CHANNEL, spibuf, 2);
+    wiringPiSPIDataRW(SPI_CHANNEL, spibuf, 2);
     unselectreceiver();
 
     return spibuf[1];
@@ -198,7 +198,7 @@ void writeRegister(byte addr, byte value)
     spibuf[0] = addr | 0x80;
     spibuf[1] = value;
     selectreceiver();
-    wiringPiSPIDataRW(CHANNEL, spibuf, 2);
+    wiringPiSPIDataRW(SPI_CHANNEL, spibuf, 2);
 
     unselectreceiver();
 }
@@ -542,7 +542,7 @@ int main () {
     pinMode(RST, OUTPUT);
 
     //int fd = 
-    wiringPiSPISetup(CHANNEL, 500000);
+    wiringPiSPISetup(SPI_CHANNEL, 500000);
     //cout << "Init result: " << fd << endl;
 
     SetupLoRa();
