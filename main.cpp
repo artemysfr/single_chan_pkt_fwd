@@ -56,6 +56,8 @@ uint32_t cp_nb_rx_nocrc;
 uint32_t cp_up_pkt_fwd;
 
 enum sf_t { SF7=7, SF8, SF9, SF10, SF11, SF12 };
+enum bw_t { BW_7K8=0, BW_10K4, BW_15K6, BW_20K8, BW_31K25, BW_41K7, BW_62K5, BW_125K, BW_250K, BW_500K };
+const char * bwc[10] = { "7.8", "10.4", "15.6", "20.8", "31.25", "41.7", "62.5", "125", "250", "500" };
 
 /*******************************************************************************
  *
@@ -68,11 +70,14 @@ int ssPin = 6;
 int dio0  = 7;
 int RST   = 0;
 
-// Set spreading factor (SF7 - SF12)
+// Set default spreading factor (SF7 - SF12)
 sf_t sf = SF7;
 
-// Set center frequency
+// Set default center frequency
 uint32_t  freq = 868100000; // in Mhz! (868.1)
+
+// Set default bandwidth
+uint32_t bw = BW_125K;
 
 // Set location
 float lat=0.0;
@@ -533,13 +538,63 @@ void receivepacket() {
     } // dio0=1
 }
 
+static sf_t check_spreading_factor(int factor)
+{
+	sf_t ret = SF7;
+
+	switch (factor)
+	{
+	case SF7:
+		ret = SF7;
+		break;
+	case SF8:
+		ret = SF8;
+		break;
+	case SF9:
+		ret = SF9;
+		break;
+	case SF10:
+		ret = SF10;
+		break;
+	case SF11:
+		ret = SF11;
+		break;
+	case SF12:
+		ret = SF12;
+		break;
+	default:
+		break;
+	}
+
+	return ret;
+}
+
+static bw_t check_bandwith(int bw)
+{
+	bw_t ret = BW_125K;
+
+	switch (bw)
+	{
+	case BW_250K:
+		ret = BW_250K;
+		break;
+	case BW_500K:
+		ret = BW_500K;
+		break;
+	default:
+		break;
+	}
+
+	return ret;
+}
+
 int main (int argc, char *argv[])
 {
     struct timeval nowtime;
     uint32_t lasttime;
     int option = -1;
 
-    while ((option = getopt (argc, argv, "i:p:")) != -1)
+    while ((option = getopt (argc, argv, "i:p:s:f:b:")) != -1)
     {
          switch (option)
          {
@@ -549,8 +604,17 @@ int main (int argc, char *argv[])
          case 'p':
              server_port = atoi(strdup(optarg));
              break;
+         case 's':
+             sf = check_spreading_factor(atoi(strdup(optarg)));
+             break;
+         case 'f':
+             freq = atoi(strdup(optarg));
+             break;
+         case 'b':
+             /*bw = */check_bandwith(atoi(strdup(optarg)));
+             break;
          default:
-             fprintf(stderr, "Usage: %s [-i ip] [-p port]\n",
+             fprintf(stderr, "Usage: %s [-i ip] [-p port] [-s spreading factor] [-f frequency in Hz] [-b bandwidth id (0 to 9)]\n",
                        argv[0]);
              exit(EXIT_FAILURE);
              break;
@@ -589,7 +653,7 @@ int main (int argc, char *argv[])
            (unsigned char)ifr.ifr_hwaddr.sa_data[4],
            (unsigned char)ifr.ifr_hwaddr.sa_data[5]);
 
-    printf("Listening at SF%i on %.6lf Mhz.\n", sf,(double)freq/1000000);
+    printf("Listening at SF%i on %.6lf MHz (bw=%s kHz).\n", sf, (double)freq/1000000, bwc[bw]);
     printf("------------------\n");
 
     printf("Forwarding packets to server %s on port %d\n", server_ip, server_port);
