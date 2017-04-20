@@ -3,8 +3,12 @@ Single Channel LoRaWAN Gateway
 This repository contains a proof-of-concept implementation of a single
 channel LoRaWAN gateway.
 
-It has been tested on the Raspberry Pi platform, using a Semtech SX1272
-transceiver (HopeRF RFM92W), and SX1276 (HopeRF RFM95W).
+It is a clone of https://github.com/tftelkamp/single_chan_pkt_fwd.git with
+some user friendlyness modifications ;-)
+Who's maintainer is: Thomas Telkamp <thomas@telkamp.eu>
+
+It has been tested on the Armadeus OPOS6UL platform (+ Dragino LoRaHat),
+using a Semtech SX1276 transceiver (HopeRF RFM95W).
 
 The code is for testing and development purposes only, and is not meant 
 for production usage. 
@@ -12,11 +16,9 @@ for production usage.
 Part of the source has been copied from the Semtech Packet Forwarder 
 (with permission).
 
-Maintainer: Thomas Telkamp <thomas@telkamp.eu>
-
 Features
 --------
-- listen on configurable frequency and spreading factor
+- listen on runtime configurable frequency and spreading factor
 - SF7 to SF12
 - status updates
 - can forward to two servers
@@ -29,19 +31,16 @@ Not (yet) supported:
 
 Dependencies
 ------------
-- SPI needs to be enabled on the Raspberry Pi (use raspi-config)
-- WiringPi: a GPIO access library written in C for the BCM2835 
-  used in the Raspberry Pi.
-  sudo apt-get install wiringpi
-  see http://wiringpi.com
+- AsDevices/WiringPi: a low level hardware access library written in C for RPi
+  and the OPOS6UL.
 - Run packet forwarder as root
 
 Connections
 -----------
-SX1272 - Raspberry
+SX1276 - OPOS6ULDev (RPi2 connector)
 
 3.3V   - 3.3V (header pin #1) 
-GND	   - GND (pin #6)
+GND    - GND (pin #6)
 MISO   - MISO (pin #21)
 MOSI   - MOSI (pin #19)
 SCK    - CLK (pin #23)
@@ -57,7 +56,7 @@ Defaults:
 - LoRa:   SF7 at 868.1 Mhz
 - Server: 54.229.214.112, port 1700  (The Things Network: croft.thethings.girovito.nl)
 
-Edit source node (main.cpp) to change configuration (look for: "Configure these values!").
+Use runtime parameters to change configuration (--help to list them all !)
 
 Please set location, email and description.
 
