@@ -3,9 +3,9 @@ Single Channel LoRaWAN Gateway
 This repository contains a proof-of-concept implementation of a single
 channel LoRaWAN gateway.
 
-It is a clone of https://github.com/tftelkamp/single_chan_pkt_fwd.git with
-some user friendlyness modifications ;-)
-Who's maintainer is: Thomas Telkamp <thomas@telkamp.eu>
+It is a clone of https://github.com/tftelkamp/single_chan_pkt_fwd.git (who's 
+maintainer is Thomas Telkamp <thomas@telkamp.eu>), with some user-friendlyness
+modifications ;-)
 
 It has been tested on the Armadeus OPOS6UL platform (+ Dragino LoRaHat),
 using a Semtech SX1276 transceiver (HopeRF RFM95W).
@@ -37,16 +37,16 @@ Dependencies
 
 Connections
 -----------
-SX1276 - OPOS6ULDev (RPi2 connector)
-
-3.3V   - 3.3V (header pin #1) 
-GND    - GND (pin #6)
-MISO   - MISO (pin #21)
-MOSI   - MOSI (pin #19)
-SCK    - CLK (pin #23)
-NSS    - GPIO6 (pin #22)
-DIO0   - GPIO7 (pin #7)
-RST    - GPIO0 (pin #11)
+| SX1276 | OPOS6ULDev (RPi2 connector)|
+|--------|----------------------------|
+| 3.3V   | 3.3V (header pin #1) |
+| GND    | GND (pin #6) |
+| MISO   | MISO (pin #21) |
+| MOSI   | MOSI (pin #19) |
+| SCK    | CLK (pin #23) |
+| NSS    | GPIO6 (pin #22) |
+| DIO0   | GPIO7 (pin #7) |
+| RST    | GPIO0 (pin #11) |
 
 Configuration
 -------------
