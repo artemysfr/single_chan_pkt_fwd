@@ -95,6 +95,7 @@ static char description[64] = "";                        /* used for free form d
 #define PORT 1700                   // The port on which to send data
 static char *server_ip = (char*) "54.72.145.119"; /* The Things Network: croft.thethings.girovito.nl */
 static int server_port = PORT;
+static int forward_packet = 0;
 
 // #############################################
 // #############################################
@@ -322,14 +323,14 @@ void SetupLoRa()
 
 void sendudp(char *msg, int length) {
 
+if (forward_packet) {
 //send the update
-#ifdef SERVER1
     inet_aton(server_ip, &si_other.sin_addr);
     if (sendto(s, (char *)msg, length, 0 , (struct sockaddr *) &si_other, slen)==-1)
     {
         die("sendto()");
     }
-#endif
+}
 
 #ifdef SERVER2
     inet_aton(server_ip, &si_other.sin_addr);
@@ -600,6 +601,7 @@ int main (int argc, char *argv[])
          {
          case 'i':
              server_ip = strdup(optarg);
+             forward_packet = 1;
              break;
          case 'p':
              server_port = atoi(strdup(optarg));
@@ -656,7 +658,9 @@ int main (int argc, char *argv[])
     printf("Listening at SF%i on %.6lf MHz (bw=%s kHz).\n", sf, (double)freq/1000000, bwc[bw]);
     printf("------------------\n");
 
-    printf("Forwarding packets to server %s on port %d\n", server_ip, server_port);
+    if (forward_packet) {
+        printf("Forwarding packets to server %s on port %d\n", server_ip, server_port);
+    }
 
     while(1) {
 
