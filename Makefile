@@ -2,7 +2,7 @@
 # Single Channel LoRaWAN Gateway
 
 CC=g++
-LD=ld
+LD=g++
 CFLAGS=-Wall
 LIBS=-lwiringPi
 
